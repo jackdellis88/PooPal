@@ -3,26 +3,29 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>Ciclo &amp; tránsito — diario privado</title>
+<title>PooPal — Track Your Relief</title>
 
 <link rel="icon" href="icon.png">
 <link rel="apple-touch-icon" href="icon.png">
 <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#F6F1E7">
+<meta name="theme-color" content="#FFFDF6">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Ciclo &amp; Tránsito">
+<meta name="apple-mobile-web-app-title" content="PooPal">
 <meta name="mobile-web-app-capable" content="yes">
 
 <style>
   :root{
-    --paper:#F6F1E7; --ink:#2E2A24; --ink-soft:#8a8172; --line:#DCD3C2;
-    --rose:#A24E5B; --rose-soft:#EEDBDD;
-    --moss:#697A52; --moss-soft:#DFE4D2;
-    --amber:#B4823D;
-    --spot:#8C6A45; --spot-soft:#E9DFCF;
-    --ph-menstrual:#F3DEE0; --ph-folicular:#EFEADB; --ph-ovulacion:#F5E6C4; --ph-lutea:#E7DEE3;
+    --paper:#FFFDF6; --ink:#1E2B37; --ink-soft:#7C8A96; --line:#EBE4D6;
+    --rose:#E8637F; --rose-soft:#FBE0E5;
+    --moss:#7F4E2D; --moss-soft:#EFE1D6;
+    --amber:#C08A3E;
+    --spot:#9C7A54; --spot-soft:#F0E7DA;
+    --blue:#5C9CE6; --blue-soft:#DCEBFB;
+    --mint:#4BD475; --mint-soft:#DFF6E6;
+    --ph-menstrual:#FBE0E5; --ph-folicular:#DFF6E6; --ph-ovulacion:#DCEBFB; --ph-lutea:#E7E0EA;
+    --shadow:0 6px 18px rgba(30,43,55,0.07);
   }
   *{box-sizing:border-box;}
   body{
@@ -30,38 +33,42 @@
     font-family:-apple-system, system-ui, sans-serif;
     padding:20px 16px 48px; max-width:480px; margin:0 auto;
   }
-  h1,.serif{font-family:Georgia,'Iowan Old Style','Palatino Linotype',serif;}
-  .card{background:#fff; border:1px solid var(--line); border-radius:14px; padding:16px; margin-bottom:16px;}
+  h1,.serif{
+    font-family: ui-rounded, "SF Pro Rounded", Nunito, Quicksand, Fredoka, -apple-system, system-ui, sans-serif;
+    font-weight:800; letter-spacing:-0.01em;
+  }
+  .card{background:#fff; border:1px solid var(--line); border-radius:22px; padding:16px; margin-bottom:16px; box-shadow:var(--shadow);}
   .muted{color:var(--ink-soft);}
   .small{font-size:12.5px;}
   .row{display:flex; gap:8px;}
   .row.wrap{flex-wrap:wrap;}
   .btn{
-    flex:1; padding:9px 0; border-radius:10px; font-size:13.5px; cursor:pointer;
-    border:1px solid var(--line); background:transparent; color:var(--ink-soft); font-family:inherit;
-    text-align:center;
+    flex:1; padding:10px 0; border-radius:16px; font-size:13.5px; cursor:pointer;
+    border:1.5px solid var(--line); background:transparent; color:var(--ink-soft); font-family:inherit;
+    text-align:center; font-weight:600; transition:transform .05s;
   }
+  .btn:active{transform:scale(0.97);}
   .btn.on-moss{border-color:var(--moss); background:var(--moss-soft); color:var(--moss);}
   .btn.on-rose{border-color:var(--rose); background:var(--rose-soft); color:var(--rose);}
   .btn.on-spot{border-color:var(--spot); background:var(--spot-soft); color:var(--spot);}
-  .btn.off{border-color:var(--ink-soft); background:#f2efe8; color:var(--ink);}
+  .btn.off{border-color:var(--blue); background:var(--blue-soft); color:var(--ink);}
   .chip{
-    padding:6px 11px; border-radius:999px; font-size:12.5px; cursor:pointer; font-family:inherit;
-    border:1px solid var(--line); background:transparent; color:var(--ink-soft);
+    padding:7px 13px; border-radius:9999px; font-size:12.5px; cursor:pointer; font-family:inherit;
+    border:1.5px solid var(--line); background:transparent; color:var(--ink-soft); font-weight:600;
   }
   .chip.active-moss{border-color:var(--moss); background:var(--moss-soft); color:var(--moss);}
   .chip.active-rose{border-color:var(--rose); background:var(--rose-soft); color:var(--rose);}
   .chip.active-spot{border-color:var(--spot); background:var(--spot-soft); color:var(--spot);}
   .chip.vol{min-width:30px; text-align:center; padding:6px 0; flex:1;}
-  .stat{flex:1; background:#fff; border:1px solid var(--line); border-radius:14px; padding:10px 12px;}
-  .stat .val{font-size:20px; font-family:Georgia,serif; line-height:1.1;}
-  .stat .lbl{font-size:10.5px; color:var(--ink-soft); margin-top:3px;}
-  .cal-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:3px;}
-  .cal-dow{text-align:center; font-size:10px; color:var(--ink-soft); padding:2px 0;}
+  .stat{flex:1; background:#fff; border:1px solid var(--line); border-radius:18px; padding:11px 12px; box-shadow:var(--shadow);}
+  .stat .val{font-size:20px; font-family:inherit; line-height:1.1; font-weight:800;}
+  .stat .lbl{font-size:10.5px; color:var(--ink-soft); margin-top:3px; font-weight:600;}
+  .cal-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:4px;}
+  .cal-dow{text-align:center; font-size:10px; color:var(--ink-soft); padding:2px 0; font-weight:700;}
   .cal-day{
-    aspect-ratio:1; border-radius:9px; cursor:pointer; font-family:inherit;
+    aspect-ratio:1; border-radius:14px; cursor:pointer; font-family:inherit;
     display:flex; flex-direction:column; align-items:center; justify-content:center;
-    border:1px solid transparent; background:transparent; padding:0;
+    border:1.5px solid transparent; background:transparent; padding:0;
   }
   .cal-day .num{font-size:12.5px;}
   .cal-day .dots{display:flex; gap:2px; margin-top:2px; height:5px;}
@@ -69,38 +76,49 @@
   .cal-day.selected{border-color:var(--ink); background:#fbf8f2 !important;}
   .cal-day.today{border-color:var(--ink-soft);}
   .cal-day.future{opacity:.3; cursor:default;}
-  .navbtn{border:none; background:transparent; font-size:20px; color:var(--ink); cursor:pointer; padding:0 10px;}
+  .navbtn{border:none; background:var(--blue-soft); color:var(--blue); font-size:20px; cursor:pointer; padding:4px 14px; border-radius:9999px; font-weight:800;}
   textarea{
-    width:100%; font-size:11px; border:1px solid var(--line); border-radius:8px; padding:8px;
+    width:100%; font-size:11px; border:1.5px solid var(--line); border-radius:14px; padding:8px;
     font-family:ui-monospace, monospace; resize:vertical;
   }
   input[type=file]{font-size:12.5px;}
-  .legend-item{display:flex; align-items:center; gap:4px;}
-  .swatch{width:10px; height:10px; border-radius:3px; display:inline-block; border:1px solid var(--line);}
-  .mv-block{margin-bottom:10px; padding:8px; border:1px solid var(--line); border-radius:10px;}
+  .legend-item{display:flex; align-items:center; gap:4px; font-weight:600;}
+  .swatch{width:10px; height:10px; border-radius:4px; display:inline-block; border:1px solid var(--line);}
+  .mv-block{margin-bottom:10px; padding:10px; border:1.5px solid var(--line); border-radius:16px;}
   .lang-toggle{
-    border:1px solid var(--line); background:#fff; color:var(--ink-soft); font-size:11.5px;
-    border-radius:999px; padding:5px 12px; cursor:pointer; font-family:inherit;
+    border:1.5px solid var(--blue); background:var(--blue-soft); color:var(--blue); font-size:11.5px; font-weight:800;
+    border-radius:9999px; padding:6px 14px; cursor:pointer; font-family:inherit;
   }
   .info-btn{
-    border:1px solid var(--line); background:transparent; color:var(--ink-soft); font-size:11px;
-    border-radius:999px; padding:2px 9px; cursor:pointer; font-family:inherit; margin-left:6px;
+    border:1.5px solid var(--line); background:#fff; color:var(--ink-soft); font-size:11px; font-weight:700;
+    border-radius:9999px; padding:3px 10px; cursor:pointer; font-family:inherit; margin-left:6px;
   }
-  .vol-info{background:#f9f6ef; border:1px solid var(--line); border-radius:10px; padding:10px 12px; margin-bottom:10px; font-size:12.5px;}
+  .vol-info{background:var(--mint-soft); border:1.5px solid var(--mint); border-radius:16px; padding:12px 14px; margin-bottom:10px; font-size:12.5px;}
   .vol-info .item{display:flex; gap:8px; margin-bottom:6px;}
   .vol-info .item:last-child{margin-bottom:0;}
-  .vol-info .n{font-family:Georgia,serif; font-weight:600; min-width:16px;}
+  .vol-info .n{font-family:inherit; font-weight:800; min-width:16px; color:var(--moss);}
+  .badge{
+    display:inline-flex; align-items:center; gap:4px; background:var(--mint-soft); color:#2E8C4E;
+    border-radius:9999px; padding:4px 10px; font-size:11px; font-weight:800; margin-top:6px;
+  }
+  .logo-row{display:flex; align-items:center; gap:10px;}
+  .logo-img{width:46px; height:46px; border-radius:14px; box-shadow:var(--shadow); flex:none;}
 </style>
 </head>
 <body>
 
 <header style="margin-bottom:18px;">
   <div class="row" style="justify-content:space-between; align-items:flex-start;">
-    <div style="font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:2px;" id="diaryLabel"></div>
+    <div class="logo-row">
+      <img src="icon.png" alt="PooPal" class="logo-img" onerror="this.style.display='none'">
+      <div>
+        <h1 id="appTitle" style="font-size:26px; margin:0; letter-spacing:-0.02em; color:var(--moss);"></h1>
+        <div id="tagline" style="font-size:12px; font-weight:700; color:var(--blue); margin-top:1px;"></div>
+      </div>
+    </div>
     <button class="lang-toggle" id="langToggle"></button>
   </div>
-  <h1 id="appTitle" style="font-size:26px; font-weight:500; margin:0; letter-spacing:-0.01em;"></h1>
-  <div id="subtitle" class="small muted" style="margin-top:4px;"></div>
+  <div id="subtitle" class="small muted" style="margin-top:8px;"></div>
   <div id="savedFlag" class="small muted" style="margin-top:4px;"></div>
 </header>
 
@@ -158,8 +176,8 @@
   var STR = {
     es: {
       langBtn: "EN",
-      diaryLabel: "Diario privado",
-      appTitle: "Ciclo & tránsito",
+      appTitle: "PooPal",
+      tagline: "Sigue tu alivio.",
       subtitle: "Guardado solo en este dispositivo. Nadie más lo ve.",
       timelineTitle: "Últimos 28 días",
       today: "hoy",
@@ -168,7 +186,8 @@
       statNoBm: "Sin ir al baño",
       statAvgGap: "Entre idas",
       statAvgPerDay: "Veces/día (media)",
-      noDataMsg: "Aún no hay registros de tránsito. Toca un día en el calendario para empezar.",
+      noDataMsg: "💩 Aún no hay registros. Toca un día en el calendario para empezar tu racha.",
+      wentTodayBadge: "✅ ¡Hoy ya fuiste!",
       futureMsg: "— aún no ha llegado.",
       bathroomQuestion: "¿Fuiste al baño?",
       timesOne: "vez", timesOther: "veces",
@@ -204,8 +223,8 @@
     },
     en: {
       langBtn: "ES",
-      diaryLabel: "Private diary",
-      appTitle: "Cycle & transit",
+      appTitle: "PooPal",
+      tagline: "Track Your Relief.",
       subtitle: "Saved only on this device. No one else sees it.",
       timelineTitle: "Last 28 days",
       today: "today",
@@ -214,7 +233,8 @@
       statNoBm: "Days without going",
       statAvgGap: "Between visits",
       statAvgPerDay: "Times/day (avg)",
-      noDataMsg: "No transit records yet. Tap a day on the calendar to start.",
+      noDataMsg: "💩 No records yet. Tap a day on the calendar to start your streak.",
+      wentTodayBadge: "✅ Already went today!",
       futureMsg: "— hasn't happened yet.",
       bathroomQuestion: "Did you go to the bathroom?",
       timesOne: "time", timesOther: "times",
@@ -390,8 +410,8 @@
   function renderStaticText(){
     document.documentElement.lang = LANG;
     document.getElementById("langToggle").textContent = t("langBtn");
-    document.getElementById("diaryLabel").textContent = t("diaryLabel");
     document.getElementById("appTitle").textContent = t("appTitle");
+    document.getElementById("tagline").textContent = t("tagline");
     document.getElementById("subtitle").textContent = t("subtitle");
     document.getElementById("timelineTitle").textContent = t("timelineTitle");
     document.getElementById("backupTitle").textContent = t("backupTitle");
@@ -480,9 +500,12 @@
       return;
     }
     var accent = (noBmStreak !== null && noBmStreak >= 3) ? "var(--amber)" : "var(--moss)";
-    el.className = "row";
+    var wentToday = state.logs[todayKey()] && state.logs[todayKey()].movements.length > 0;
+    el.className = "row wrap";
     el.innerHTML =
-      '<div class="stat"><div class="val" style="color:'+accent+';">'+(noBmStreak===null?"—":noBmStreak+" d")+'</div><div class="lbl">'+t("statNoBm")+'</div></div>'+
+      '<div class="stat"><div class="val" style="color:'+accent+';">'+(noBmStreak===null?"—":noBmStreak+" d")+'</div><div class="lbl">'+t("statNoBm")+'</div>'+
+        (wentToday ? '<div class="badge">'+t("wentTodayBadge")+'</div>' : '')+
+      '</div>'+
       '<div class="stat"><div class="val" style="color:var(--ink-soft);">'+(avgGap===null?"—":avgGap+" d")+'</div><div class="lbl">'+t("statAvgGap")+'</div></div>'+
       '<div class="stat"><div class="val" style="color:var(--ink-soft);">'+(avgPerDay===null?"—":avgPerDay)+'</div><div class="lbl">'+t("statAvgPerDay")+'</div></div>';
   }
