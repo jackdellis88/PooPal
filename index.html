@@ -765,6 +765,12 @@
   // ---------- inicio ----------
   load();
   render();
+
+  if ("serviceWorker" in navigator){
+    window.addEventListener("load", function(){
+      navigator.serviceWorker.register("sw.js").catch(function(){ /* offline install just won't be available; app still works */ });
+    });
+  }
 })();
 </script>
 </body>
