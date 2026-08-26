@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Ciclo &amp; tránsito — diario privado</title>
+
+<link rel="icon" href="icon.png">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icon.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#F6F1E7">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Ciclo &amp; Tránsito">
+<meta name="mobile-web-app-capable" content="yes">
+
+<style>
+  :root{
+    --paper:#F6F1E7; --ink:#2E2A24; --ink-soft:#8a8172; --line:#DCD3C2;
+    --rose:#A24E5B; --rose-soft:#EEDBDD;
+    --moss:#697A52; --moss-soft:#DFE4D2;
+    --amber:#B4823D;
+    --spot:#8C6A45; --spot-soft:#E9DFCF;
+    --ph-menstrual:#F3DEE0; --ph-folicular:#EFEADB; --ph-ovulacion:#F5E6C4; --ph-lutea:#E7DEE3;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:-apple-system, system-ui, sans-serif;
+    padding:20px 16px 48px; max-width:480px; margin:0 auto;
+  }
+  h1,.serif{font-family:Georgia,'Iowan Old Style','Palatino Linotype',serif;}
+  .card{background:#fff; border:1px solid var(--line); border-radius:14px; padding:16px; margin-bottom:16px;}
+  .muted{color:var(--ink-soft);}
+  .small{font-size:12.5px;}
+  .row{display:flex; gap:8px;}
+  .row.wrap{flex-wrap:wrap;}
+  .btn{
+    flex:1; padding:9px 0; border-radius:10px; font-size:13.5px; cursor:pointer;
+    border:1px solid var(--line); background:transparent; color:var(--ink-soft); font-family:inherit;
+    text-align:center;
+  }
+  .btn.on-moss{border-color:var(--moss); background:var(--moss-soft); color:var(--moss);}
+  .btn.on-rose{border-color:var(--rose); background:var(--rose-soft); color:var(--rose);}
+  .btn.on-spot{border-color:var(--spot); background:var(--spot-soft); color:var(--spot);}
+  .btn.off{border-color:var(--ink-soft); background:#f2efe8; color:var(--ink);}
+  .chip{
+    padding:6px 11px; border-radius:999px; font-size:12.5px; cursor:pointer; font-family:inherit;
+    border:1px solid var(--line); background:transparent; color:var(--ink-soft);
+  }
+  .chip.active-moss{border-color:var(--moss); background:var(--moss-soft); color:var(--moss);}
+  .chip.active-rose{border-color:var(--rose); background:var(--rose-soft); color:var(--rose);}
+  .chip.active-spot{border-color:var(--spot); background:var(--spot-soft); color:var(--spot);}
+  .chip.vol{min-width:30px; text-align:center; padding:6px 0; flex:1;}
+  .stat{flex:1; background:#fff; border:1px solid var(--line); border-radius:14px; padding:10px 12px;}
+  .stat .val{font-size:20px; font-family:Georgia,serif; line-height:1.1;}
+  .stat .lbl{font-size:10.5px; color:var(--ink-soft); margin-top:3px;}
+  .cal-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:3px;}
+  .cal-dow{text-align:center; font-size:10px; color:var(--ink-soft); padding:2px 0;}
+  .cal-day{
+    aspect-ratio:1; border-radius:9px; cursor:pointer; font-family:inherit;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    border:1px solid transparent; background:transparent; padding:0;
+  }
+  .cal-day .num{font-size:12.5px;}
+  .cal-day .dots{display:flex; gap:2px; margin-top:2px; height:5px;}
+  .dot{width:5px; height:5px; border-radius:999px; display:inline-block;}
+  .cal-day.selected{border-color:var(--ink); background:#fbf8f2 !important;}
+  .cal-day.today{border-color:var(--ink-soft);}
+  .cal-day.future{opacity:.3; cursor:default;}
+  .navbtn{border:none; background:transparent; font-size:20px; color:var(--ink); cursor:pointer; padding:0 10px;}
+  textarea{
+    width:100%; font-size:11px; border:1px solid var(--line); border-radius:8px; padding:8px;
+    font-family:ui-monospace, monospace; resize:vertical;
+  }
+  input[type=file]{font-size:12.5px;}
+  .legend-item{display:flex; align-items:center; gap:4px;}
+  .swatch{width:10px; height:10px; border-radius:3px; display:inline-block; border:1px solid var(--line);}
+  .mv-block{margin-bottom:10px; padding:8px; border:1px solid var(--line); border-radius:10px;}
+  .lang-toggle{
+    border:1px solid var(--line); background:#fff; color:var(--ink-soft); font-size:11.5px;
+    border-radius:999px; padding:5px 12px; cursor:pointer; font-family:inherit;
+  }
+  .info-btn{
+    border:1px solid var(--line); background:transparent; color:var(--ink-soft); font-size:11px;
+    border-radius:999px; padding:2px 9px; cursor:pointer; font-family:inherit; margin-left:6px;
+  }
+  .vol-info{background:#f9f6ef; border:1px solid var(--line); border-radius:10px; padding:10px 12px; margin-bottom:10px; font-size:12.5px;}
+  .vol-info .item{display:flex; gap:8px; margin-bottom:6px;}
+  .vol-info .item:last-child{margin-bottom:0;}
+  .vol-info .n{font-family:Georgia,serif; font-weight:600; min-width:16px;}
+</style>
+</head>
+<body>
+
+<header style="margin-bottom:18px;">
+  <div class="row" style="justify-content:space-between; align-items:flex-start;">
+    <div style="font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:2px;" id="diaryLabel"></div>
+    <button class="lang-toggle" id="langToggle"></button>
+  </div>
+  <h1 id="appTitle" style="font-size:26px; font-weight:500; margin:0; letter-spacing:-0.01em;"></h1>
+  <div id="subtitle" class="small muted" style="margin-top:4px;"></div>
+  <div id="savedFlag" class="small muted" style="margin-top:4px;"></div>
+</header>
+
+<div class="card" style="padding:12px 8px 8px;">
+  <div id="timelineTitle" style="font-size:11px; color:var(--ink-soft); letter-spacing:.08em; text-transform:uppercase; padding:0 8px 6px;"></div>
+  <svg id="timeline" viewBox="0 0 448 128" width="100%" height="128" style="display:block;"></svg>
+</div>
+
+<div id="phaseCard"></div>
+<div id="statsRow" class="row" style="margin-bottom:16px;"></div>
+
+<div class="card">
+  <div class="row" style="align-items:center; justify-content:space-between; margin-bottom:10px;">
+    <button class="navbtn" id="prevMonth">‹</button>
+    <div class="serif" id="monthLabel" style="font-size:15px; text-transform:capitalize;"></div>
+    <button class="navbtn" id="nextMonth">›</button>
+  </div>
+  <div class="cal-grid" id="dowRow" style="margin-bottom:4px;"></div>
+  <div class="cal-grid" id="calGrid"></div>
+</div>
+
+<div class="card" id="dayEditor"></div>
+
+<div class="card">
+  <div id="backupTitle" class="serif" style="font-size:15px; margin-bottom:6px;"></div>
+  <div id="backupDesc" class="small muted" style="margin-bottom:10px;"></div>
+  <div class="row" style="margin-bottom:8px;">
+    <button class="btn off" id="exportBtn" style="flex:1;"></button>
+  </div>
+  <div style="height:1px; background:var(--line); margin:14px 0;"></div>
+  <div id="restoreTitle" style="font-size:13px; margin-bottom:8px; font-weight:500;"></div>
+  <input type="file" id="importFile" accept="application/json,.json">
+  <div id="importMsg" class="small muted" style="margin-top:6px;"></div>
+</div>
+
+<div class="small muted" style="display:flex; flex-direction:column; gap:8px; padding:0 4px;">
+  <div class="row wrap" id="legendMain"></div>
+  <div class="row wrap" id="phaseLegend"></div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var PHASE_COLOR = { menstrual:"var(--ph-menstrual)", folicular:"var(--ph-folicular)", ovulacion:"var(--ph-ovulacion)", lutea:"var(--ph-lutea)" };
+  var STORAGE_KEY = "ciclo-transito-data-v1";
+  var LANG_KEY = "ciclo-transito-lang";
+
+  var MONTHS = {
+    es: ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"],
+    en: ["January","February","March","April","May","June","July","August","September","October","November","December"]
+  };
+  var DOW = { es: ["L","M","X","J","V","S","D"], en: ["M","T","W","T","F","S","S"] };
+
+  var STR = {
+    es: {
+      langBtn: "EN",
+      diaryLabel: "Diario privado",
+      appTitle: "Ciclo & tránsito",
+      subtitle: "Guardado solo en este dispositivo. Nadie más lo ve.",
+      timelineTitle: "Últimos 28 días",
+      today: "hoy",
+      phaseCurrent: "Fase actual",
+      nextPeriodEst: "Próxima regla est.",
+      statNoBm: "Sin ir al baño",
+      statAvgGap: "Entre idas",
+      statAvgPerDay: "Veces/día (media)",
+      noDataMsg: "Aún no hay registros de tránsito. Toca un día en el calendario para empezar.",
+      futureMsg: "— aún no ha llegado.",
+      bathroomQuestion: "¿Fuiste al baño?",
+      timesOne: "vez", timesOther: "veces",
+      nothingToday: "Nada registrado hoy.",
+      addMovement: "+ Añadir deposición",
+      volumeLabel: "Cantidad",
+      infoBtn: "ⓘ escala",
+      volumeInfoTitle: "Escala de cantidad",
+      periodQuestion: "¿Tienes la regla?",
+      yes: "Sí", no: "No",
+      flowLight: "Ligero", flowMedium: "Medio", flowHeavy: "Abundante",
+      spottingQuestion: "¿Manchado (spotting), sin ser regla?",
+      spotBrown: "Marrón", spotPink: "Rosado", spotRed: "Rojo claro",
+      bmDuro: "Duro / costó", bmNormal: "Normal", bmBlando: "Blando / líquido",
+      backupTitle: "Copia de seguridad",
+      backupDesc: "Exporta un archivo antes de borrar cookies o cambiar de móvil. Para restaurar, importa ese mismo archivo aquí.",
+      exportBtn: "Exportar copia (.json)",
+      restoreTitle: "Restaurar desde archivo",
+      importOk: "Datos restaurados correctamente ✓",
+      importBadFormat: "El archivo no tiene el formato esperado.",
+      importBadFile: "No se pudo leer el archivo. ¿Es el .json correcto?",
+      legendTransit: "tránsito", legendPeriod: "regla", legendSpot: "manchado",
+      phaseMenstrual: "Menstrual", phaseFolicular: "Folicular", phaseOvulacion: "Ovulación", phaseLutea: "Lútea",
+      savedPrefix: "Guardado:",
+      savedFail: "⚠ No se pudo guardar en este dispositivo (¿memoria llena o modo privado?).",
+      volScale: [
+        {n:1, name:"Guijarro", desc:"Casi nada, un aviso."},
+        {n:2, name:"Ración pequeña", desc:"Poca cosa, pero cuenta."},
+        {n:3, name:"El de siempre", desc:"Cantidad normal, sin sorpresas."},
+        {n:4, name:"Atasco", desc:"Una buena, con esfuerzo."},
+        {n:5, name:"Rompe-inodoros", desc:"Histórica. Apunta la fecha."}
+      ]
+    },
+    en: {
+      langBtn: "ES",
+      diaryLabel: "Private diary",
+      appTitle: "Cycle & transit",
+      subtitle: "Saved only on this device. No one else sees it.",
+      timelineTitle: "Last 28 days",
+      today: "today",
+      phaseCurrent: "Current phase",
+      nextPeriodEst: "Next period est.",
+      statNoBm: "Days without going",
+      statAvgGap: "Between visits",
+      statAvgPerDay: "Times/day (avg)",
+      noDataMsg: "No transit records yet. Tap a day on the calendar to start.",
+      futureMsg: "— hasn't happened yet.",
+      bathroomQuestion: "Did you go to the bathroom?",
+      timesOne: "time", timesOther: "times",
+      nothingToday: "Nothing logged today.",
+      addMovement: "+ Add a visit",
+      volumeLabel: "Volume",
+      infoBtn: "ⓘ scale",
+      volumeInfoTitle: "Volume scale",
+      periodQuestion: "Are you on your period?",
+      yes: "Yes", no: "No",
+      flowLight: "Light", flowMedium: "Medium", flowHeavy: "Heavy",
+      spottingQuestion: "Spotting (not your period)?",
+      spotBrown: "Brown", spotPink: "Pink", spotRed: "Bright red",
+      bmDuro: "Hard / straining", bmNormal: "Normal", bmBlando: "Soft / loose",
+      backupTitle: "Backup",
+      backupDesc: "Export a file before clearing cookies or switching phones. To restore, import that same file here.",
+      exportBtn: "Export backup (.json)",
+      restoreTitle: "Restore from file",
+      importOk: "Data restored successfully ✓",
+      importBadFormat: "The file isn't in the expected format.",
+      importBadFile: "Couldn't read the file. Is it the right .json?",
+      legendTransit: "transit", legendPeriod: "period", legendSpot: "spotting",
+      phaseMenstrual: "Menstrual", phaseFolicular: "Follicular", phaseOvulacion: "Ovulation", phaseLutea: "Luteal",
+      savedPrefix: "Saved:",
+      savedFail: "⚠ Couldn't save on this device (storage full or private mode?).",
+      volScale: [
+        {n:1, name:"Pebble", desc:"Barely anything, just a heads-up."},
+        {n:2, name:"Snack-size", desc:"Small, but it counts."},
+        {n:3, name:"The Usual", desc:"Standard, no surprises."},
+        {n:4, name:"Log Jam", desc:"A solid one, some effort involved."},
+        {n:5, name:"Toilet Blocker", desc:"Historic. Write down the date."}
+      ]
+    }
+  };
+
+  var LANG = localStorage.getItem(LANG_KEY) || "es";
+  function t(key){ return STR[LANG][key]; }
+
+  // El historial de ciclos real NO vive en este código público.
+  // Se carga de forma privada tras la primera apertura mediante "Restaurar desde archivo".
+  var HIST_CYCLES = [];
+
+  // ---------- fechas ----------
+  function pad(n){ return n < 10 ? "0"+n : ""+n; }
+  function toKey(d){ return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); }
+  function fromKey(k){ var p = k.split("-").map(Number); return new Date(p[0], p[1]-1, p[2]); }
+  function daysBetween(a,b){ return Math.round((a-b)/86400000); }
+  function addDays(d,n){ return new Date(d.getTime()+n*86400000); }
+  function todayKey(){ return toKey(new Date()); }
+  function formatShort(d){ return d.getDate()+" "+MONTHS[LANG][d.getMonth()].slice(0,3); }
+  function isFutureDate(d){ return d > new Date(new Date().toDateString()); }
+
+  // ---------- estado ----------
+  var state = { logs:{}, cycles:[] };
+  var cursor = (function(){ var t2 = new Date(); return new Date(t2.getFullYear(), t2.getMonth(), 1); })();
+  var selected = todayKey();
+  var showVolInfo = false;
+
+  function defaultDay(){ return { movements:[], period:false, flow:null, spotting:false, spottingType:null }; }
+
+  function normalizeDay(raw){
+    if (!raw) return defaultDay();
+    var movements;
+    if (Array.isArray(raw.movements)) {
+      movements = raw.movements.map(function(m){
+        return { type: m.type || "normal", volume: (m.volume >= 1 && m.volume <= 5) ? m.volume : 3 };
+      });
+    } else if (raw.bm) {
+      movements = [{ type: raw.bmType || "normal", volume: 3 }];
+    } else {
+      movements = [];
+    }
+    return {
+      movements: movements,
+      period: !!raw.period,
+      flow: raw.flow || null,
+      spotting: !!raw.spotting,
+      spottingType: raw.spottingType || null
+    };
+  }
+  function normalizeAllLogs(logsObj){
+    var out = {};
+    Object.keys(logsObj || {}).forEach(function(k){ out[k] = normalizeDay(logsObj[k]); });
+    return out;
+  }
+  function getDay(k){ return state.logs[k] ? state.logs[k] : defaultDay(); }
+
+  function load(){
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (raw){
+        var parsed = JSON.parse(raw);
+        state.logs = normalizeAllLogs(parsed.logs || {});
+        state.cycles = parsed.cycles || [];
+      }
+    } catch(e){ /* datos corruptos o inexistentes: empezamos limpio */ }
+
+    if (!state.cycles.length){
+      state.cycles = HIST_CYCLES;
+      mergeCyclesIntoLogs(HIST_CYCLES);
+      save();
+    }
+  }
+
+  function save(){
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      document.getElementById("savedFlag").textContent = t("savedPrefix") + " " + new Date().toLocaleString(LANG === "es" ? "es-ES" : "en-US");
+    } catch(e){
+      document.getElementById("savedFlag").textContent = t("savedFail");
+    }
+  }
+
+  function mergeCyclesIntoLogs(cycles){
+    cycles.forEach(function(c){
+      var start = fromKey(c.start);
+      for (var i = 0; i < c.periodDays; i++){
+        var k = toKey(addDays(start, i));
+        var existing = normalizeDay(state.logs[k]);
+        if (!existing.period){
+          existing.period = true;
+          state.logs[k] = existing;
+        }
+      }
+    });
+  }
+
+  // ---------- ciclo / fases ----------
+  function cyclesSorted(){
+    return state.cycles.slice().sort(function(a,b){ return a.start < b.start ? -1 : a.start > b.start ? 1 : 0; });
+  }
+  function cycleAverages(cycles){
+    var withLen = cycles.filter(function(c){ return c.cycleLength; });
+    var avgCycleLength = withLen.length ? withLen.reduce(function(s,c){ return s+c.cycleLength; },0)/withLen.length : 28;
+    var withOv = cycles.filter(function(c){ return c.ovulationDay; });
+    var avgOvulationDay = withOv.length ? withOv.reduce(function(s,c){ return s+c.ovulationDay; },0)/withOv.length : 14;
+    return { avgCycleLength:avgCycleLength, avgOvulationDay:avgOvulationDay };
+  }
+  function cycleForDate(dateObj, sorted){
+    var applicable = null;
+    for (var i=0;i<sorted.length;i++){
+      if (fromKey(sorted[i].start) <= dateObj) applicable = sorted[i]; else break;
+    }
+    return applicable;
+  }
+  function phaseForDate(dateObj, sorted, avg){
+    var c = cycleForDate(dateObj, sorted);
+    if (!c) return null;
+    var start = fromKey(c.start);
+    var dayOfCycle = daysBetween(dateObj, start) + 1;
+    var periodDays = c.periodDays != null ? c.periodDays : 5;
+    var ovulationDay = c.ovulationDay != null ? c.ovulationDay : Math.round(avg.avgOvulationDay);
+    if (dayOfCycle <= periodDays) return { phase:"menstrual", dayOfCycle:dayOfCycle };
+    if (Math.abs(dayOfCycle - ovulationDay) <= 1) return { phase:"ovulacion", dayOfCycle:dayOfCycle };
+    if (dayOfCycle < ovulationDay) return { phase:"folicular", dayOfCycle:dayOfCycle };
+    return { phase:"lutea", dayOfCycle:dayOfCycle };
+  }
+  function phaseLabel(phaseKey){
+    return { menstrual: t("phaseMenstrual"), folicular: t("phaseFolicular"), ovulacion: t("phaseOvulacion"), lutea: t("phaseLutea") }[phaseKey];
+  }
+
+  // ---------- render ----------
+  function render(){
+    renderStaticText();
+    renderTimeline();
+    renderPhaseCard();
+    renderStats();
+    renderCalendar();
+    renderDayEditor();
+    renderLegend();
+  }
+
+  function renderStaticText(){
+    document.documentElement.lang = LANG;
+    document.getElementById("langToggle").textContent = t("langBtn");
+    document.getElementById("diaryLabel").textContent = t("diaryLabel");
+    document.getElementById("appTitle").textContent = t("appTitle");
+    document.getElementById("subtitle").textContent = t("subtitle");
+    document.getElementById("timelineTitle").textContent = t("timelineTitle");
+    document.getElementById("backupTitle").textContent = t("backupTitle");
+    document.getElementById("backupDesc").textContent = t("backupDesc");
+    document.getElementById("exportBtn").textContent = t("exportBtn");
+    document.getElementById("restoreTitle").textContent = t("restoreTitle");
+  }
+
+  function renderTimeline(){
+    var svg = document.getElementById("timeline");
+    var w=448,h=128,padX=6,bmY=26,periodY=62,spotY=98;
+    var days = [];
+    var today = new Date();
+    for (var i=27;i>=0;i--){
+      var d = new Date(today.getTime()-i*86400000);
+      var k = toKey(d);
+      var entry = getDay(k);
+      days.push({ key:k, date:d, bmCount: entry.movements.length, period:!!entry.period, spotting:!!entry.spotting });
+    }
+    var step = (w-padX*2)/(days.length-1);
+    function path(field, y){
+      return days.map(function(d,i){ return (i===0?"M ":"L ")+(padX+i*step)+" "+(d[field]? y-12 : y+12); }).join(" ");
+    }
+    var circles = days.map(function(d,i){
+      var out = "";
+      if (d.bmCount>0) out += '<circle cx="'+(padX+i*step)+'" cy="'+(bmY-12)+'" r="'+(3+Math.min(d.bmCount-1,3))+'" fill="var(--moss)"/>';
+      if (d.period) out += '<circle cx="'+(padX+i*step)+'" cy="'+(periodY-12)+'" r="3" fill="var(--rose)"/>';
+      if (d.spotting) out += '<circle cx="'+(padX+i*step)+'" cy="'+(spotY-12)+'" r="3" fill="var(--spot)"/>';
+      return out;
+    }).join("");
+    svg.innerHTML =
+      '<line x1="'+padX+'" y1="'+bmY+'" x2="'+(w-padX)+'" y2="'+bmY+'" stroke="var(--line)" stroke-dasharray="1 4"/>'+
+      '<line x1="'+padX+'" y1="'+periodY+'" x2="'+(w-padX)+'" y2="'+periodY+'" stroke="var(--line)" stroke-dasharray="1 4"/>'+
+      '<line x1="'+padX+'" y1="'+spotY+'" x2="'+(w-padX)+'" y2="'+spotY+'" stroke="var(--line)" stroke-dasharray="1 4"/>'+
+      '<path d="'+path("bmCount",bmY)+'" fill="none" stroke="var(--moss)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="0.85"/>'+
+      '<path d="'+path("period",periodY)+'" fill="none" stroke="var(--rose)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="0.85"/>'+
+      '<path d="'+path("spotting",spotY)+'" fill="none" stroke="var(--spot)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="0.85"/>'+
+      circles+
+      '<text x="'+padX+'" y="'+(h-4)+'" font-size="9" fill="var(--ink-soft)">'+formatShort(days[0].date)+'</text>'+
+      '<text x="'+(w-padX)+'" y="'+(h-4)+'" font-size="9" fill="var(--ink-soft)" text-anchor="end">'+t("today")+'</text>';
+  }
+
+  function renderPhaseCard(){
+    var sorted = cyclesSorted();
+    var el = document.getElementById("phaseCard");
+    if (!sorted.length){ el.innerHTML=""; return; }
+    var avg = cycleAverages(sorted);
+    var info = phaseForDate(new Date(), sorted, avg);
+    if (!info){ el.innerHTML=""; return; }
+    var last = sorted[sorted.length-1];
+    var nextPeriod = addDays(fromKey(last.start), Math.round(avg.avgCycleLength));
+    el.innerHTML =
+      '<div class="card" style="background:'+PHASE_COLOR[info.phase]+'; display:flex; justify-content:space-between; align-items:center;">'+
+        '<div>'+
+          '<div style="font-size:10.5px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.06em;">'+t("phaseCurrent")+'</div>'+
+          '<div class="serif" style="font-size:18px; margin-top:2px;">'+phaseLabel(info.phase)+' · '+info.dayOfCycle+'</div>'+
+        '</div>'+
+        '<div style="text-align:right; font-size:11.5px; color:var(--ink-soft);">'+t("nextPeriodEst")+'<br><span style="font-size:13px; color:var(--ink);">'+formatShort(nextPeriod)+'</span></div>'+
+      '</div>';
+  }
+
+  function renderStats(){
+    var today = new Date();
+    var keys = Object.keys(state.logs).sort();
+    var lastBM = null;
+    for (var i=keys.length-1;i>=0;i--){ if (state.logs[keys[i]].movements.length>0 && !lastBM) lastBM = fromKey(keys[i]); }
+    var noBmStreak = lastBM ? daysBetween(today, lastBM) : null;
+
+    var bmDates = keys.filter(function(k){ return state.logs[k].movements.length>0; }).map(fromKey).sort(function(a,b){ return a-b; });
+    var avgGap = null;
+    if (bmDates.length >= 2){
+      var total = 0;
+      for (var j=1;j<bmDates.length;j++) total += daysBetween(bmDates[j], bmDates[j-1]);
+      avgGap = (total/(bmDates.length-1)).toFixed(1);
+    }
+    var daysWithBM = keys.filter(function(k){ return state.logs[k].movements.length>0; });
+    var avgPerDay = null;
+    if (daysWithBM.length){
+      var totalMovs = daysWithBM.reduce(function(s,k){ return s + state.logs[k].movements.length; }, 0);
+      avgPerDay = (totalMovs / daysWithBM.length).toFixed(1);
+    }
+    var hasData = keys.some(function(k){ return state.logs[k].movements.length>0 || state.logs[k].period; });
+    var el = document.getElementById("statsRow");
+    if (!hasData){
+      el.outerHTML = '<div id="statsRow" class="card small muted">'+t("noDataMsg")+'</div>';
+      return;
+    }
+    var accent = (noBmStreak !== null && noBmStreak >= 3) ? "var(--amber)" : "var(--moss)";
+    el.className = "row";
+    el.innerHTML =
+      '<div class="stat"><div class="val" style="color:'+accent+';">'+(noBmStreak===null?"—":noBmStreak+" d")+'</div><div class="lbl">'+t("statNoBm")+'</div></div>'+
+      '<div class="stat"><div class="val" style="color:var(--ink-soft);">'+(avgGap===null?"—":avgGap+" d")+'</div><div class="lbl">'+t("statAvgGap")+'</div></div>'+
+      '<div class="stat"><div class="val" style="color:var(--ink-soft);">'+(avgPerDay===null?"—":avgPerDay)+'</div><div class="lbl">'+t("statAvgPerDay")+'</div></div>';
+  }
+
+  function renderCalendar(){
+    document.getElementById("monthLabel").textContent = MONTHS[LANG][cursor.getMonth()] + " " + cursor.getFullYear();
+    var dowRow = document.getElementById("dowRow");
+    dowRow.innerHTML = DOW[LANG].map(function(d){ return '<div class="cal-dow">'+d+'</div>'; }).join("");
+
+    var year = cursor.getFullYear(), month = cursor.getMonth();
+    var first = new Date(year, month, 1);
+    var startOffset = (first.getDay()+6)%7;
+    var daysInMonth = new Date(year, month+1, 0).getDate();
+    var sorted = cyclesSorted();
+    var avg = cycleAverages(sorted);
+    var tk = todayKey();
+
+    var html = "";
+    for (var i=0;i<startOffset;i++) html += '<div></div>';
+    for (var d=1; d<=daysInMonth; d++){
+      var dateObj = new Date(year, month, d);
+      var k = toKey(dateObj);
+      var entry = getDay(k);
+      var future = isFutureDate(dateObj);
+      var classes = "cal-day";
+      if (k===selected) classes += " selected";
+      if (k===tk) classes += " today";
+      if (future) classes += " future";
+      var bg = "transparent";
+      if (!future){
+        var info = phaseForDate(dateObj, sorted, avg);
+        if (info) bg = PHASE_COLOR[info.phase];
+      }
+      var dots = "";
+      if (entry.movements.length===1) dots += '<span class="dot" style="background:var(--moss);"></span>';
+      else if (entry.movements.length>1) dots += '<span style="font-size:8px; color:var(--moss); font-weight:600;">×'+entry.movements.length+'</span>';
+      if (entry.period) dots += '<span class="dot" style="background:var(--rose);"></span>';
+      if (entry.spotting) dots += '<span class="dot" style="background:var(--spot);"></span>';
+      html += '<button class="'+classes+'" data-key="'+k+'" '+(future?"disabled":"")+' style="background:'+(future?"transparent":bg)+';">'+
+                '<span class="num">'+d+'</span><span class="dots">'+dots+'</span>'+
+              '</button>';
+    }
+    document.getElementById("calGrid").innerHTML = html;
+
+    document.querySelectorAll(".cal-day:not(.future)").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        selected = this.getAttribute("data-key");
+        render();
+      });
+    });
+  }
+
+  function renderDayEditor(){
+    var el = document.getElementById("dayEditor");
+    var dateObj = fromKey(selected);
+    var label = dateObj.getDate() + " " + MONTHS[LANG][dateObj.getMonth()] + " " + dateObj.getFullYear();
+
+    if (isFutureDate(dateObj)){
+      el.innerHTML = '<div class="small muted">'+label+' '+t("futureMsg")+'</div>';
+      return;
+    }
+
+    var day = normalizeDay(state.logs[selected]);
+    var sorted = cyclesSorted();
+    var avg = cycleAverages(sorted);
+    var phase = phaseForDate(dateObj, sorted, avg);
+    var phaseHtml = phase ? '<div class="small muted">'+phaseLabel(phase.phase)+' · '+phase.dayOfCycle+'</div>' : '';
+
+    var typeLabels = { duro:t("bmDuro"), normal:t("bmNormal"), blando:t("bmBlando") };
+
+    var volInfoHtml = "";
+    if (showVolInfo){
+      volInfoHtml = '<div class="vol-info">' +
+        '<div style="font-weight:600; margin-bottom:6px;">'+t("volumeInfoTitle")+'</div>' +
+        t("volScale").map(function(v){
+          return '<div class="item"><span class="n">'+v.n+'</span><span><b>'+v.name+'</b> — '+v.desc+'</span></div>';
+        }).join("") +
+        '</div>';
+    }
+
+    var movementsHtml = day.movements.map(function(m, idx){
+      var typeChips = ["duro","normal","blando"].map(function(v){
+        return '<button class="chip mvtype '+(m.type===v?"active-moss":"")+'" data-idx="'+idx+'" data-v="'+v+'">'+typeLabels[v]+'</button>';
+      }).join("");
+      var volChips = [1,2,3,4,5].map(function(v){
+        return '<button class="chip vol mvvol '+(m.volume===v?"active-moss":"")+'" data-idx="'+idx+'" data-v="'+v+'">'+v+'</button>';
+      }).join("");
+      return '<div class="mv-block">'+
+        '<div class="row" style="justify-content:space-between; align-items:center; margin-bottom:8px;">'+
+          '<div class="row wrap" style="gap:6px;">'+typeChips+'</div>'+
+          '<button class="chip mvremove" data-idx="'+idx+'" style="border-color:var(--ink-soft); color:var(--ink-soft); flex:none;">✕</button>'+
+        '</div>'+
+        '<div class="row" style="align-items:center; gap:6px;">'+
+          '<span class="small muted" style="flex:none;">'+t("volumeLabel")+':</span>'+
+          '<div class="row" style="gap:4px; flex:1;">'+volChips+'</div>'+
+        '</div>'+
+      '</div>';
+    }).join("");
+
+    el.innerHTML =
+      '<div class="row" style="align-items:baseline; justify-content:space-between; margin-bottom:12px;">'+
+        '<div class="serif" style="font-size:16px;">'+label+'</div>'+phaseHtml+
+      '</div>'+
+
+      '<div style="margin-bottom:14px;">'+
+        '<div style="font-size:13px; margin-bottom:8px; font-weight:500;">'+t("bathroomQuestion")+
+          (day.movements.length ? ' <span class="muted" style="font-weight:400;">· '+day.movements.length+' '+(day.movements.length>1?t("timesOther"):t("timesOne"))+'</span>' : '')+
+          '<button class="info-btn" id="volInfoBtn">'+t("infoBtn")+'</button>'+
+        '</div>'+
+        volInfoHtml +
+        (day.movements.length ? movementsHtml : '<div class="small muted" style="margin-bottom:8px;">'+t("nothingToday")+'</div>')+
+        '<button class="btn off" id="addMovement" style="margin-top:2px;">'+t("addMovement")+'</button>'+
+      '</div>'+
+
+      '<div style="margin-bottom:14px;">'+
+        '<div style="font-size:13px; margin-bottom:8px; font-weight:500;">'+t("periodQuestion")+'</div>'+
+        '<div class="row">'+
+          '<button class="btn '+(day.period?"on-rose":"")+'" id="perYes">'+t("yes")+'</button>'+
+          '<button class="btn '+(!day.period?"off":"")+'" id="perNo">'+t("no")+'</button>'+
+        '</div>'+
+        (day.period ? '<div class="row wrap" style="margin-top:8px;">'+
+          [["ligero",t("flowLight")],["medio",t("flowMedium")],["abundante",t("flowHeavy")]].map(function(o){
+            return '<button class="chip flow '+(day.flow===o[0]?"active-rose":"")+'" data-v="'+o[0]+'">'+o[1]+'</button>';
+          }).join("")+'</div>' : '')+
+      '</div>'+
+
+      '<div>'+
+        '<div style="font-size:13px; margin-bottom:8px; font-weight:500;">'+t("spottingQuestion")+'</div>'+
+        '<div class="row">'+
+          '<button class="btn '+(day.spotting?"on-spot":"")+'" id="spotYes">'+t("yes")+'</button>'+
+          '<button class="btn '+(!day.spotting?"off":"")+'" id="spotNo">'+t("no")+'</button>'+
+        '</div>'+
+        (day.spotting ? '<div class="row wrap" style="margin-top:8px;">'+
+          [["marron",t("spotBrown")],["rosa",t("spotPink")],["rojo",t("spotRed")]].map(function(o){
+            return '<button class="chip spottype '+(day.spottingType===o[0]?"active-spot":"")+'" data-v="'+o[0]+'">'+o[1]+'</button>';
+          }).join("")+'</div>' : '')+
+      '</div>';
+
+    function patch(p){
+      var current = normalizeDay(state.logs[selected]);
+      state.logs[selected] = Object.assign(current, p);
+      save();
+      render();
+    }
+
+    document.getElementById("volInfoBtn").onclick = function(){ showVolInfo = !showVolInfo; render(); };
+
+    document.getElementById("addMovement").onclick = function(){
+      var current = normalizeDay(state.logs[selected]);
+      current.movements.push({ type:"normal", volume:3 });
+      state.logs[selected] = current;
+      save(); render();
+    };
+    document.querySelectorAll(".mvtype").forEach(function(b){
+      b.onclick = function(){
+        var idx = parseInt(this.getAttribute("data-idx"),10);
+        var current = normalizeDay(state.logs[selected]);
+        current.movements[idx].type = this.getAttribute("data-v");
+        state.logs[selected] = current;
+        save(); render();
+      };
+    });
+    document.querySelectorAll(".mvvol").forEach(function(b){
+      b.onclick = function(){
+        var idx = parseInt(this.getAttribute("data-idx"),10);
+        var current = normalizeDay(state.logs[selected]);
+        current.movements[idx].volume = parseInt(this.getAttribute("data-v"),10);
+        state.logs[selected] = current;
+        save(); render();
+      };
+    });
+    document.querySelectorAll(".mvremove").forEach(function(b){
+      b.onclick = function(){
+        var idx = parseInt(this.getAttribute("data-idx"),10);
+        var current = normalizeDay(state.logs[selected]);
+        current.movements.splice(idx,1);
+        state.logs[selected] = current;
+        save(); render();
+      };
+    });
+
+    document.getElementById("perYes").onclick = function(){ patch({ period:true, flow: day.flow || "medio" }); };
+    document.getElementById("perNo").onclick = function(){ patch({ period:false, flow:null }); };
+    document.getElementById("spotYes").onclick = function(){ patch({ spotting:true, spottingType: day.spottingType || "marron" }); };
+    document.getElementById("spotNo").onclick = function(){ patch({ spotting:false, spottingType:null }); };
+
+    document.querySelectorAll(".flow").forEach(function(b){ b.onclick = function(){ patch({ flow: this.getAttribute("data-v") }); }; });
+    document.querySelectorAll(".spottype").forEach(function(b){ b.onclick = function(){ patch({ spottingType: this.getAttribute("data-v") }); }; });
+  }
+
+  function renderLegend(){
+    document.getElementById("legendMain").innerHTML =
+      '<span class="legend-item"><span class="dot" style="background:var(--moss);"></span>'+t("legendTransit")+'</span>'+
+      '<span class="legend-item"><span class="dot" style="background:var(--rose);"></span>'+t("legendPeriod")+'</span>'+
+      '<span class="legend-item"><span class="dot" style="background:var(--spot);"></span>'+t("legendSpot")+'</span>';
+    document.getElementById("phaseLegend").innerHTML =
+      ["menstrual","folicular","ovulacion","lutea"].map(function(k){
+        return '<span class="legend-item"><span class="swatch" style="background:'+PHASE_COLOR[k]+';"></span>'+phaseLabel(k)+'</span>';
+      }).join("");
+  }
+
+  // ---------- idioma ----------
+  document.getElementById("langToggle").addEventListener("click", function(){
+    LANG = LANG === "es" ? "en" : "es";
+    localStorage.setItem(LANG_KEY, LANG);
+    render();
+  });
+
+  // ---------- navegación calendario ----------
+  document.getElementById("prevMonth").addEventListener("click", function(){
+    cursor = new Date(cursor.getFullYear(), cursor.getMonth()-1, 1); render();
+  });
+  document.getElementById("nextMonth").addEventListener("click", function(){
+    cursor = new Date(cursor.getFullYear(), cursor.getMonth()+1, 1); render();
+  });
+
+  // ---------- exportar / importar ----------
+  document.getElementById("exportBtn").addEventListener("click", function(){
+    var payload = JSON.stringify({ logs: state.logs, cycles: state.cycles, exportedAt: new Date().toISOString() }, null, 2);
+    var blob = new Blob([payload], { type: "application/json" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    var stamp = new Date().toISOString().slice(0,10);
+    a.href = url;
+    a.download = "ciclo-transito-" + stamp + ".json";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
+
+  document.getElementById("importFile").addEventListener("change", function(e){
+    var file = e.target.files[0];
+    var msg = document.getElementById("importMsg");
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(evt){
+      try {
+        var parsed = JSON.parse(evt.target.result);
+        if (!parsed || typeof parsed !== "object" || !parsed.logs){
+          msg.textContent = t("importBadFormat");
+          return;
+        }
+        state.logs = normalizeAllLogs(parsed.logs || {});
+        state.cycles = parsed.cycles && parsed.cycles.length ? parsed.cycles : HIST_CYCLES;
+        save();
+        render();
+        msg.textContent = t("importOk");
+      } catch(err){
+        msg.textContent = t("importBadFile");
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = "";
+  });
+
+  // ---------- inicio ----------
+  load();
+  render();
+})();
+</script>
+</body>
+</html>
